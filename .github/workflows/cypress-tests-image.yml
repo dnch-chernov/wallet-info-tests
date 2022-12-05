@@ -40,9 +40,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+      # - name: Repository Dispatch
+      #   uses: peter-evans/repository-dispatch@v2
+      #   with:
+      #     token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
+      #     repository: dnch-chernov/grand-test-automation
+      #     event-type: frontend-test
+
+      - name: Invoke e2e test workflow. Wait for result
+        uses: aurelien-baudet/workflow-dispatch@v2
         with:
+          workflow: Deploy and Test
           token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
-          repository: dnch-chernov/grand-test-automation
-          event-type: frontend-test
+          repo: dnch-chernov/grand-test-automation
