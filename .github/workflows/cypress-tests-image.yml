@@ -6,43 +6,82 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  CYPRESS_IMAGE_NAME: ${{ github.repository }}-cypress
+  PYTEST_IMAGE_NAME: ${{ github.repository }}-pytest
 
 jobs:
-  build-and-push-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+  - build-and-push-cypress-image:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Log in to the Container registry
+          uses: docker/login-action@v2
+          with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@v4
+          with:
+            images: ${{ env.REGISTRY }}/${{ env.CYPRESS_IMAGE_NAME }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: cypress-tests
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+        - name: Build and push Docker image
+          uses: docker/build-push-action@v3
+          with:
+            context: cypress-tests
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Invoke e2e test workflow. Wait for result
-        uses: aurelien-baudet/workflow-dispatch@v2
-        with:
-          workflow: Deploy and Test
-          token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
-          repo: dnch-chernov/grand-test-automation
+        - name: Invoke e2e test workflow. Wait for result
+          uses: aurelien-baudet/workflow-dispatch@v2
+          with:
+            workflow: Deploy and Test
+            token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
+            repo: dnch-chernov/grand-test-automation
+
+  - build-and-push-pytest-image:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
+
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+
+        - name: Log in to the Container registry
+          uses: docker/login-action@v2
+          with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@v4
+          with:
+            images: ${{ env.REGISTRY }}/${{ env.PYTEST_IMAGE_NAME }}
+
+        - name: Build and push Docker image
+          uses: docker/build-push-action@v3
+          with:
+            context: pytest_tests
+            push: true
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+
+        - name: Invoke e2e test workflow. Wait for result
+          uses: aurelien-baudet/workflow-dispatch@v2
+          with:
+            workflow: Deploy and Test
+            token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
+            repo: dnch-chernov/grand-test-automation
