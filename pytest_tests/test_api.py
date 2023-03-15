@@ -27,8 +27,8 @@ class TestBalance:
     wallet_address = os.getenv(
         "WALLET_ADDRESS", "0x300045c41b5334772C25196ac0035bCDD511a821"
     )
-    expected_eth_value = os.getenv("EXPECTED_ETH_VALUE", "0.024925767330357063")
-    expected_usdc_value = os.getenv("EXPECTED_USDC_VALUE", "61.280028")
+    expected_eth_value = float(os.getenv("EXPECTED_ETH_VALUE", "0.024925767330357063"))
+    expected_usdc_value = float(os.getenv("EXPECTED_USDC_VALUE", "61.280028"))
 
     @pytest.mark.parametrize(
         "token, value", [("eth", expected_eth_value), ("usdc", expected_usdc_value)]
