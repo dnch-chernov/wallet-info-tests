@@ -47,6 +47,7 @@ jobs:
           workflow: Deploy and Test
           token: ${{ secrets.GTA_REPO_ACCESS_TOKEN }}
           repo: dnch-chernov/grand-test-automation
+          ref: ${{ github.ref_name }}
 
   build-and-push-pytest-image:
     runs-on: ubuntu-latest
